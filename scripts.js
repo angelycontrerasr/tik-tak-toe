@@ -1,10 +1,10 @@
 console.log('Happy developing ✨')
 
-const board =[
-        ["X", "X", null],
-        ["O", "O", null],
-        ["O", null, null]
-    ]
+let board = [
+    [null, null, null],
+    [null, null, null],
+    [null, null, null]
+];
 function CreatePlayer(symbol) {
     const player = symbol
     return {player}
@@ -56,22 +56,14 @@ function winCases(board) {
 // if not null and nobody win yet then play
 
 function Game(board, currentPlayer) {
-    // Simulate a move (for simplicity, we'll place "O" at [0][2])
-    let row = 0;
-    let col = 2;
-
-    if (board[row][col] === null) {
-        board[row][col] = currentPlayer; // Place the current player's symbol
-    }
-
-    // Check if the move resulted in a win
+    // The move will now be set in handleCellClick
     const winner = winCases(board);
     if (winner) {
-        return `Player ${winner} wins!`; // Declare the winner
+        alert(`Player ${winner} wins!`);
+        return board;
     }
 
-    // If no winner, return the updated board
-    return board;
+    return board; // Return updated board
 }
 function renderTextBoard(board) {
     return board.map(row =>
@@ -83,7 +75,6 @@ function renderTextBoard(board) {
 document.getElementById("text-board").textContent = renderTextBoard(board);
 let firstPlayer = WhoGoesFirst(playerX, playerO);
 console.log("The first player is:", firstPlayer);
-console.log(Game(board, "X"))
 
 // eventually I'll need to replace the text board with images
 //render the board with a  loop in the board object and an if to determine whether to show an x or an image
@@ -91,25 +82,28 @@ function RenderBoard(board) {
     const boardDiv = document.getElementById("board");
     boardDiv.innerHTML = ""; // Clear existing board
 
-    for (let row of board) {
+    for (let rowIndex = 0; rowIndex < 3; rowIndex++) {
         const rowDiv = document.createElement("div");
         rowDiv.classList.add("row");
 
-        for (let cell of row) {
+        for (let colIndex = 0; colIndex < 3; colIndex++) {
             const cellDiv = document.createElement("div");
             cellDiv.classList.add("cell");
+            cellDiv.dataset.row = rowIndex.toString();
+            cellDiv.dataset.col = colIndex.toString();
 
-            if (cell === "O") {
+            if (board[rowIndex][colIndex] === "O") {
                 const img = document.createElement("img");
                 img.src = "OIcon.png";
                 cellDiv.appendChild(img);
-            } else if (cell === "X") {
+            } else if (board[rowIndex][colIndex] === "X") {
                 const img = document.createElement("img");
                 img.src = "XIcon.png";
                 cellDiv.appendChild(img);
-            } else {
-                cellDiv.textContent = ""; // Empty cell
             }
+
+            // Add click event listener
+            cellDiv.addEventListener("click", handleCellClick);
 
             rowDiv.appendChild(cellDiv);
         }
@@ -117,5 +111,38 @@ function RenderBoard(board) {
         boardDiv.appendChild(rowDiv);
     }
 }
+let currentPlayer = WhoGoesFirst(playerX, playerO); // Start with player X
+
+function handleCellClick(event) {
+    let cellDiv = event.target;
+
+    // If the user clicked on the image, we need to get its parent div
+    if (cellDiv.tagName === "IMG") {
+        cellDiv = cellDiv.parentElement;
+    }
+
+    const row = parseInt(cellDiv.dataset.row);
+    const col = parseInt(cellDiv.dataset.col);
+
+    // Check if the cell is empty before making a move
+    if (board[row][col] === null) {
+        board[row][col] = currentPlayer.player; // Update board with the current player's symbol
+
+        // Check for a winner
+        const winner = winCases(board);
+        if (winner) {
+            alert(`Player ${winner} wins!`);
+            return;
+        }
+
+        // Switch player
+        currentPlayer = (currentPlayer === playerX) ? playerO : playerX;
+
+        // Re-render the board
+        RenderBoard(board);
+    }
+}
 // Call RenderBoard without assigning its return value
-RenderBoard(board);
+document.addEventListener("DOMContentLoaded", () => {
+    RenderBoard(board);
+});
