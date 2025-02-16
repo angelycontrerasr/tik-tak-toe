@@ -2,7 +2,7 @@ console.log('Happy developing ✨')
 
 const board =[
         ["X", "X", null],
-        ["O", null, null],
+        ["O", "O", null],
         ["O", null, null]
     ]
 function CreatePlayer(symbol) {
@@ -57,8 +57,11 @@ function winCases(board) {
 
 function Game(board, currentPlayer) {
     // Simulate a move (for simplicity, we'll place "O" at [0][2])
-    if (board[0][2] === null) {
-        board[0][2] = currentPlayer; // Place the current player's symbol
+    let row = 0;
+    let col = 2;
+
+    if (board[row][col] === null) {
+        board[row][col] = currentPlayer; // Place the current player's symbol
     }
 
     // Check if the move resulted in a win
@@ -70,6 +73,49 @@ function Game(board, currentPlayer) {
     // If no winner, return the updated board
     return board;
 }
+function renderTextBoard(board) {
+    return board.map(row =>
+        row.map(cell => cell === null ? " " : cell).join(" | ")
+    ).join("\n---------\n");
+}
+
+// Render the board and set it as the innerHTML
+document.getElementById("text-board").textContent = renderTextBoard(board);
 let firstPlayer = WhoGoesFirst(playerX, playerO);
 console.log("The first player is:", firstPlayer);
 console.log(Game(board, "X"))
+
+// eventually I'll need to replace the text board with images
+//render the board with a  loop in the board object and an if to determine whether to show an x or an image
+function RenderBoard(board) {
+    const boardDiv = document.getElementById("board");
+    boardDiv.innerHTML = ""; // Clear existing board
+
+    for (let row of board) {
+        const rowDiv = document.createElement("div");
+        rowDiv.classList.add("row");
+
+        for (let cell of row) {
+            const cellDiv = document.createElement("div");
+            cellDiv.classList.add("cell");
+
+            if (cell === "O") {
+                const img = document.createElement("img");
+                img.src = "OIcon.png";
+                cellDiv.appendChild(img);
+            } else if (cell === "X") {
+                const img = document.createElement("img");
+                img.src = "XIcon.png";
+                cellDiv.appendChild(img);
+            } else {
+                cellDiv.textContent = ""; // Empty cell
+            }
+
+            rowDiv.appendChild(cellDiv);
+        }
+
+        boardDiv.appendChild(rowDiv);
+    }
+}
+// Call RenderBoard without assigning its return value
+RenderBoard(board);
