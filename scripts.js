@@ -77,7 +77,7 @@ function resetGame() {
 // Render the board and set it as the innerHTML
 
 let firstPlayer = WhoGoesFirst(playerX, playerO);
-
+document.getElementById("who-starts").textContent = firstPlayer.player +" " + "starts!";
 // eventually I'll need to replace the text board with images
 //render the board with a  loop in the board object and an if to determine whether to show an x or an image
 function RenderBoard(board) {
